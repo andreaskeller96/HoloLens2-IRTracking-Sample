@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<QCARInfo>
+    <TargetSet version="36.0" toolVersion="v5.6.0-6-g4fb8708">
+        <ModelTarget name="torso_ascii" targetId="43cc2f7197b44aaeb2865611ee277e9f" version="13.0" toolVersion="v5.6.0-6-g4fb8708" bbox="-0.146160 -0.000392 -0.227494 0.160576 0.151286 0.179830" trackingMode="scan" upVector="0.0 1.0 0.0" optimizeTrackingFor="default" realisticTextures="yes" />
+    </TargetSet>
+    <Assembly name="torso_ascii" assemblyId="97bebdc10790482bafdf0e77c68e9854">
+        <Part name="torso_ascii" translation="0 0 0" rotation="AD: 0 0 1 0" />
+        <EntryPoint name="(none)" trained="yes" />
+    </Assembly>
+</QCARInfo>
