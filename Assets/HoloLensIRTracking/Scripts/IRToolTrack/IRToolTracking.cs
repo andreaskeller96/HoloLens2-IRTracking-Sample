@@ -13,8 +13,9 @@ using HL2IRToolTracking;
 public class IRToolTracking : MonoBehaviour
 {
 #if ENABLE_WINMD_SUPPORT
-    HL2IRTracking toolTracking;
+    HL2ResearchMode researchMode;
 #endif
+    private bool sensorStarted = false;
     private bool startToolTracking = false;
 
     private IRToolController[] tools = null;
@@ -23,7 +24,7 @@ public class IRToolTracking : MonoBehaviour
     {
         var toolTransform = Enumerable.Repeat<float>(0, 8).ToArray();
 #if ENABLE_WINMD_SUPPORT
-        toolTransform = toolTracking.GetToolTransform(identifier);        
+        toolTransform = researchMode.GetToolTransform(identifier);        
 #endif
         return toolTransform;
 
@@ -32,10 +33,9 @@ public class IRToolTracking : MonoBehaviour
     public Int64 GetTimestamp()
     {
 #if ENABLE_WINMD_SUPPORT
-        return toolTracking.GetTrackingTimestamp();
-#else
-        return 0;
+        return researchMode.GetTrackingTimestamp();
 #endif
+        return 0;
     }
 
     public void Start()
@@ -48,20 +48,17 @@ public class IRToolTracking : MonoBehaviour
     public void StartToolTracking()
     {
         Debug.Log("Start Tracking");
+        if (!sensorStarted) StartSensors();
 #if ENABLE_WINMD_SUPPORT
-        if (!startToolTracking){
-            if (toolTracking == null)
-            {
-                toolTracking = new HL2IRTracking();
-            }
-            SetReferenceWorldCoordinateSystem();
-            toolTracking.RemoveAllToolDefinitions();
+        if (!startToolTracking && sensorStarted){
+            researchMode.RemoveAllToolDefinitions();
+            researchMode.SetupTracking();
             foreach (IRToolController tool in tools)
             {
-                toolTracking.AddToolDefinition(tool.sphere_count, tool.sphere_positions, tool.sphere_radius, tool.identifier);
+                researchMode.AddToolDefinition(tool.sphere_count, tool.sphere_positions, tool.sphere_radius, tool.identifier);
                 tool.StartTracking();
             }
-            toolTracking.StartToolTracking();
+            researchMode.StartToolTracking();
             startToolTracking = true;
         }
 #endif
@@ -69,25 +66,23 @@ public class IRToolTracking : MonoBehaviour
 
     public void StopToolTracking()
     {
-        if (!startToolTracking)
-        {
-            return;
-        }
 
 #if ENABLE_WINMD_SUPPORT
-        toolTracking.StopToolTracking();
-        startToolTracking = false;
-        foreach (IRToolController tool in tools)
-        {
-            tool.StopTracking();
+        if (sensorStarted && startToolTracking){
+            researchMode.StopToolTracking();
+            startToolTracking = false;
+            foreach (IRToolController tool in tools)
+            {
+                tool.StopTracking();
+            }
         }
 #endif
         Debug.Log("Stopped Tracking");
     }
 
-    private void SetReferenceWorldCoordinateSystem()
+    private void StartSensors()
     {
-        print("Setting World Coordinate");
+        print("Starting Sensors");
 #if ENABLE_WINMD_SUPPORT
         // Get Unity Origin Coordinate
 #if UNITY_2021_2_OR_NEWER
@@ -100,16 +95,41 @@ public class IRToolTracking : MonoBehaviour
         IntPtr WorldOriginPtr = UnityEngine.XR.WSA.WorldManager.GetNativeISpatialCoordinateSystemPtr();
         var unityWorldOrigin = Marshal.GetObjectForIUnknown(WorldOriginPtr) as Windows.Perception.Spatial.SpatialCoordinateSystem;
 #endif
+
+        print(unityWorldOrigin);
+
+        if (researchMode == null)
+        {
+            researchMode = new HL2ResearchMode();
+        }
         // Set Unity Origin Coordinate
-        toolTracking.SetReferenceCoordinateSystem(unityWorldOrigin);
+        researchMode.SetReferenceCoordinateSystem(unityWorldOrigin);
+        // Start Ahat camera
+        researchMode.InitializeDepthSensor();
+
+        // false: do not reconstruct point cloud; true: start IR sphere filtering
+        researchMode.StartDepthSensorLoop(false, true); 
+
+        sensorStarted = true;
 #endif
 
 
     }
 
+    public async void StopSensorsEvent()
+    {
+        startToolTracking = false;
+
+#if ENABLE_WINMD_SUPPORT
+        await researchMode.StopAllSensorDevice();
+        researchMode = null;
+        sensorStarted = false;
+#endif
+    }
+
     public void ExitApplication()
     {
-        StopToolTracking();
+        StopSensorsEvent();
         Application.Quit();
     }
 }

@@ -2,6 +2,8 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -13,15 +15,20 @@ namespace IRToolTrack
         public string identifier;
         public GameObject[] spheres;
         public bool disableUntilDetection = false;
+        public bool disableWhenTrackingLost = false;
+        public float secondsLostUntilDisable = 3;
         public float sphere_radius = 6.5f;
+
         private bool childrenActive = true;
 
         private IRToolTracking irToolTracking;
         private Int64 lastUpdate = 0;
+        private float lastSpotted = 0;
         private Vector3 targetPosition = Vector3.zero;
         private Quaternion targetRotation = Quaternion.identity;
         private List<Vector3> positions = new List<Vector3>();
         private List<Quaternion> rotations = new List<Quaternion>();
+        private bool[] childAtIndexActive;
         public int sphere_count
         {
             get { return spheres.Length; }
@@ -45,10 +52,19 @@ namespace IRToolTrack
 
         void Start()
         {
+            childAtIndexActive = new bool[transform.childCount];
             irToolTracking = FindObjectOfType<IRToolTracking>();
             if (disableUntilDetection)
             {
-                gameObject.SetChildrenActive(false);
+                for (int i = 0; i<transform.childCount; i++)
+                {
+                    var curChild = transform.GetChild(i).gameObject;
+                    if (curChild.activeSelf)
+                    {
+                        childAtIndexActive[i] = true;
+                        curChild.SetActive(false);
+                    }
+                }
                 childrenActive = false;
             }
         }
@@ -100,14 +116,29 @@ namespace IRToolTrack
             {
                 if (!childrenActive)
                 {
-                    gameObject.SetChildrenActive(true);
+                    for (int i = 0; i < transform.childCount; i++)
+                    {
+                        var curChild = transform.GetChild(i).gameObject;
+                        if (childAtIndexActive[i])
+                        {
+                            curChild.SetActive(true);
+                        }
+                    }
                     childrenActive = true;
                 }
 
                 Quaternion q = new Quaternion(tool_transform[3], tool_transform[4], tool_transform[5], tool_transform[6]);
                 targetRotation = q;
                 targetPosition = new Vector3(tool_transform[0], tool_transform[1], tool_transform[2]);
-                
+                lastSpotted = Time.time;
+            }
+            else if (childrenActive && disableWhenTrackingLost && Time.time-lastSpotted>secondsLostUntilDisable)
+            {
+                for (int i = 0; i < transform.childCount; i++)
+                {
+                    transform.GetChild(i).gameObject.SetActive(false);
+                }
+                childrenActive = false;
             }
 
 
