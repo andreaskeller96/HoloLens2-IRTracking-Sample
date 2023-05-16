@@ -58,7 +58,12 @@ public class IRToolTracking : MonoBehaviour
             toolTracking.RemoveAllToolDefinitions();
             foreach (IRToolController tool in tools)
             {
-                toolTracking.AddToolDefinition(tool.sphere_count, tool.sphere_positions, tool.sphere_radius, tool.identifier);
+                if (tool.max_occluded_spheres>0 && (tool.sphere_count - tool.max_occluded_spheres)>=3)
+                {
+                    toolTracking.AddToolDefinition(tool.sphere_count, tool.sphere_positions, tool.sphere_radius, tool.identifier, tool.sphere_count-tool.max_occluded_spheres);
+                }
+                else
+                    toolTracking.AddToolDefinition(tool.sphere_count, tool.sphere_positions, tool.sphere_radius, tool.identifier);
                 tool.StartTracking();
             }
             toolTracking.StartToolTracking();

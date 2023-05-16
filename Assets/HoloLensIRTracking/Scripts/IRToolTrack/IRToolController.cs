@@ -18,6 +18,7 @@ namespace IRToolTrack
         public bool disableWhenTrackingLost = false;
         public float secondsLostUntilDisable = 3;
         public float sphere_radius = 6.5f;
+        public int max_occluded_spheres = 0;
 
         private bool childrenActive = true;
 
