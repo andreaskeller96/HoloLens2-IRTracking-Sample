@@ -1,6 +1,6 @@
 # On-Device HoloLens 2 IR Tracking Sample
 
-This project contains a sample scene showcasing how to use track passive IR sphere markers using only the HoloLens 2 sensors.
+This project contains a sample scene showcasing how to track passive, retro-reflective IR sphere marker arrays using only the HoloLens 2 sensors.
 
 
 ## How to use
