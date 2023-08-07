@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
 
@@ -18,6 +19,8 @@ namespace IRToolTrack
         public float secondsLostUntilDisable = 3;
         public float sphere_radius = 6.5f;
         public int max_occluded_spheres = 0;
+        public float lowpass_factor_rotation = 0.3f;
+        public float lowpass_factor_position = 0.6f;
 
         private bool childrenActive = true;
 
@@ -54,6 +57,7 @@ namespace IRToolTrack
         {
             childAtIndexActive = new bool[transform.childCount];
             irToolTracking = FindObjectOfType<IRToolTracking>();
+#if !UNITY_EDITOR
             if (disableUntilDetection)
             {
                 for (int i = 0; i<transform.childCount; i++)
@@ -67,6 +71,7 @@ namespace IRToolTrack
                 }
                 childrenActive = false;
             }
+#endif
         }
 
         bool LoadROMFile(string romFilePath)

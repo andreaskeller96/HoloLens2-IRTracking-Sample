@@ -47,7 +47,7 @@ public class IRToolTracking : MonoBehaviour
 
     public void StartToolTracking()
     {
-        Debug.Log("Start Tracking");
+            Debug.Log("Start Tracking");
 #if ENABLE_WINMD_SUPPORT
         if (!startToolTracking){
             if (toolTracking == null)
@@ -58,12 +58,12 @@ public class IRToolTracking : MonoBehaviour
             toolTracking.RemoveAllToolDefinitions();
             foreach (IRToolController tool in tools)
             {
-                if (tool.max_occluded_spheres>0 && (tool.sphere_count - tool.max_occluded_spheres)>=3)
+                int min_visible_spheres = tool.sphere_count;
+                if (tool.max_occluded_spheres > 0 && (tool.sphere_count - tool.max_occluded_spheres) >= 3)
                 {
-                    toolTracking.AddToolDefinition(tool.sphere_count, tool.sphere_positions, tool.sphere_radius, tool.identifier, tool.sphere_count-tool.max_occluded_spheres);
+                    min_visible_spheres = tool.sphere_count - tool.max_occluded_spheres;
                 }
-                else
-                    toolTracking.AddToolDefinition(tool.sphere_count, tool.sphere_positions, tool.sphere_radius, tool.identifier);
+                toolTracking.AddToolDefinition(tool.sphere_count, tool.sphere_positions, tool.sphere_radius, tool.identifier, min_visible_spheres, tool.lowpass_factor_rotation, tool.lowpass_factor_position);
                 tool.StartTracking();
             }
             toolTracking.StartToolTracking();
