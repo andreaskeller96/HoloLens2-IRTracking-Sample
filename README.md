@@ -9,7 +9,8 @@ In the tracking sample scene, adjust the sphere positions under MixedRealityPlay
 To run this on the HoloLens2, simply build and deploy. Make sure to use Release settings for the final compile in Visual Studio.
 
 ## Thanks
-This project makes use of a number of awesome open source libraries, including:
+Special thanks to Wenhao Gu for his hololens plugin project that this dll is based on: https://github.com/petergu684/HoloLens2-ResearchMode-Unity
+This project also makes use of a number of awesome open source libraries, including:
 * [opencv](https://github.com/opencv/opencv)
 * [libtiff](https://gitlab.com/libtiff/libtiff)
 * [zlib](https://github.com/madler/zlib)
