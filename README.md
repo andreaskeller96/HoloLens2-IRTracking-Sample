@@ -1,9 +1,11 @@
 # On-Device HoloLens 2 IR Tracking Sample
 
-This project contains a sample scene showcasing how to track passive, retro-reflective IR sphere marker arrays using only the HoloLens 2 sensors.
+This project contains a sample scene showcasing how to track passive, retro-reflective IR sphere marker arrays using only the HoloLens 2 AHAT sensor.
 
 
 ## How to use
+First make sure your HoloLens 2 is configured with research mode enabled.
+
 In the tracking sample scene, adjust the sphere positions under MixedRealityPlayspace->SampleTool->Sphere* so their local positions correspond to your own physical tracking array. If you have an array with a different amount of spheres, adjust the SampleTool GameObject accordingly. The default sphere radius is set as 6.5mm, if you are working with different sizes you need to adjust the number for best results. If you are working with flat markers, set the sphere radius to 0.
 
 To run this on the HoloLens2, simply build and deploy. Make sure to use Release settings for the final compile in Visual Studio.
